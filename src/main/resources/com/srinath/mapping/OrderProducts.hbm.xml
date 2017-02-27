@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.srinath.mapping">
+
+    <class name="OrderProducts" table="order_products">
+        <id name="orderProductId" column="order_product_id" type="long">
+            <generator class="identity" />
+        </id>
+
+        <many-to-one name="product" class="Products" fetch="select">
+            <column name="product_id" not-null="true" />
+        </many-to-one>
+
+        <many-to-one name="order" class="Orders" fetch="select">
+            <column name="order_id" not-null="true" />
+        </many-to-one>
+
+    </class>
+</hibernate-mapping>
