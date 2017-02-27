@@ -5,9 +5,11 @@ import com.srinath.mapping.OrderProducts;
 import com.srinath.mapping.Orders;
 import com.srinath.mapping.Products;
 import com.srinath.util.HibernateUtil;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 
 
 import java.io.FileNotFoundException;
@@ -17,6 +19,14 @@ import java.util.Date;
 import java.util.List;
 
 public class App {
+
+    //Time between orders in seconds
+    public static int TIME_BETWEEN_ORDERS = 1;
+
+    //Total number of orders to take
+    public static int NUMBER_OF_ORDERS = 1000;
+
+
     public static void main(String[] args) {
         try {
             App app = new App();
@@ -51,26 +61,29 @@ public class App {
 
     private void generateOrders() throws InterruptedException {
 
-        for (int ord = 0; ord < 1000; ord++) {
+        for (int ord = 0; ord < NUMBER_OF_ORDERS; ord++) {
             SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
             Session session = sessionFactory.openSession();
             session.beginTransaction();
 
-            Query query = session.createQuery("FROM Products");
-            List<Products> results = query.list();
+            Criteria criteria = session.createCriteria(Products.class);
+            criteria.add(Restrictions.sqlRestriction("1=1 order by random()"));
+            criteria.setMaxResults(10);
+            List<Products> results = criteria.list();
 
+            /*Query query = session.createQuery("FROM Products");
+            List<Products> results = query.();
+*/
 
             Orders order = new Orders();
             order.setOrderData(new Date());
             session.save(order);
 
-            for (int i = 0; i < 10; i++) {
-
-                int randomProd = randomWithRange(1, results.size());
+            for (int i = 0; i < results.size(); i++) {
 
                 OrderProducts orderProducts = new OrderProducts();
                 orderProducts.setOrder(order);
-                orderProducts.setProduct(results.get(randomProd));
+                orderProducts.setProduct(results.get(i));
                 session.save(orderProducts);
 
             }
@@ -79,14 +92,10 @@ public class App {
             session.getTransaction().commit();
             session.close();
 
-            Thread.sleep(5000);
+            Thread.sleep(TIME_BETWEEN_ORDERS * 1000);
         }
 
 
     }
 
-    private int randomWithRange(int min, int max) {
-        int range = Math.abs(max - min) + 1;
-        return (int) (Math.random() * range) + (min <= max ? min : max);
-    }
 }
