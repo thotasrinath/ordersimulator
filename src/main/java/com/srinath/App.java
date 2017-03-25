@@ -21,10 +21,13 @@ import java.util.List;
 public class App {
 
     //Time between orders in seconds
-    public static int TIME_BETWEEN_ORDERS = 1;
+    public static int TIME_BETWEEN_ORDERS = 60;
 
     //Total number of orders to take
     public static int NUMBER_OF_ORDERS = 1000;
+
+    //Total number of products per order
+    public static int NUMBER_OF_PRODUCTS_PER_ORDER = 10;
 
 
     public static void main(String[] args) {
@@ -68,7 +71,7 @@ public class App {
 
             Criteria criteria = session.createCriteria(Products.class);
             criteria.add(Restrictions.sqlRestriction("1=1 order by random()"));
-            criteria.setMaxResults(10);
+            criteria.setMaxResults(NUMBER_OF_PRODUCTS_PER_ORDER);
             List<Products> results = criteria.list();
 
             /*Query query = session.createQuery("FROM Products");
